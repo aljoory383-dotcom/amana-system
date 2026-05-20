@@ -484,8 +484,56 @@ tbody td{padding:11px 14px;color:var(--dgray);}
             <div class="form-group"><label>الدائرة <span id="dept-req-lbl" class="req">*</span><span id="dept-opt-lbl" class="opt" style="display:none"> (اختياري إذا حُدد الفريق)</span></label><select id="f-dept" onchange="onDeptChange()"><option value="">— اختر الدائرة —</option></select></div>
             <div class="form-group"><label>الفريق <span class="opt">(اختياري)</span></label><select id="f-team" onchange="onTeamChange()"><option value="">— بدون فريق —</option></select></div>
             <div class="form-group"><label>نوع الإجراء</label><select id="f-type"><option>تنظيمي</option><option>إداري</option><option>مالي</option><option>فني</option><option>قانوني</option><option>أخرى</option></select></div>
-            <div class="form-group"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="f-start"></div>
-            <div class="form-group"><label>تاريخ النهاية <span class="req">*</span></label><input type="date" id="f-end"></div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label>نوع الجدول الزمني <span class="req">*</span></label>
+              <select id="f-schedule" onchange="onScheduleChange()" style="width:100%">
+                <option value="fixed">📅 محدد المدة — له بداية ونهاية واضحة</option>
+                <option value="monthly">🔁 متكرر شهري — مثل الرواتب</option>
+                <option value="yearly">📆 متكرر سنوي — مثل الاحتفالات الوطنية</option>
+                <option value="ongoing">♾️ مستمر — طوال العام بدون نهاية</option>
+              </select>
+            </div>
+            <!-- حقول محدد المدة -->
+            <div id="grp-fixed" class="form-group"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="f-start"></div>
+            <div id="grp-fixed-end" class="form-group"><label>تاريخ النهاية <span class="req">*</span></label><input type="date" id="f-end"></div>
+            <!-- حقول متكرر شهري -->
+            <div id="grp-monthly" class="form-group" style="display:none"><label>يوم التنفيذ من الشهر <span class="req">*</span></label>
+              <select id="f-month-day"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select>
+            </div>
+            <!-- حقول متكرر سنوي -->
+            <div id="grp-yearly-day" class="form-group" style="display:none"><label>يوم التنفيذ <span class="req">*</span></label>
+              <select id="f-year-day"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select>
+            </div>
+            <div id="grp-yearly-month" class="form-group" style="display:none"><label>شهر التنفيذ <span class="req">*</span></label>
+              <select id="f-year-month">
+                <option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option>
+                <option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option>
+                <option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option>
+                <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+              </select>
+            </div>
+            <!-- حقول مستمر -->
+            <div id="grp-ongoing" class="form-group" style="display:none"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="f-ongoing-start"></div>
+            <!-- تنبيهات -->
+            <div id="grp-alert" class="form-group" style="display:none;grid-column:1/-1">
+              <label>التنبيه قبل التنفيذ</label>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer">
+                  <input type="checkbox" id="f-alert-on" checked onchange="onAlertToggle()" style="width:16px;height:16px;accent-color:#1A2F5A">
+                  <span>تفعيل التنبيه</span>
+                </label>
+                <div id="grp-alert-days" style="display:flex;align-items:center;gap:8px">
+                  <span>قبل التنفيذ بـ</span>
+                  <select id="f-alert-days" style="padding:4px 8px;border:1px solid #ccc;border-radius:6px">
+                    <option value="1">يوم واحد</option>
+                    <option value="3">3 أيام</option>
+                    <option value="5" selected>5 أيام</option>
+                    <option value="7">أسبوع</option>
+                    <option value="14">أسبوعان</option>
+                  </select>
+                </div>
+              </div>
+            </div>
             <div class="form-group" style="grid-column:1/-1"><label>ملاحظات عامة</label><textarea id="f-notes" placeholder="ملاحظات على الإجراء..."></textarea></div>
           </div>
           <div class="sec-div"><h4>⚙️ العمليات</h4></div>
@@ -775,6 +823,59 @@ let chartObjs={};
 const DEPTS=[...new Set(USERS.map(u=>u.dept))].sort();
 
 // ═══════════════ PERSIST ═══════════════
+// ═══════════════ SCHEDULE TYPE ═══════════════
+function onScheduleChange(){
+  const v=document.getElementById('f-schedule').value;
+  const show=(id,b)=>{const e=document.getElementById(id);if(e)e.style.display=b?'':'none';};
+  show('grp-fixed',     v==='fixed');
+  show('grp-fixed-end', v==='fixed');
+  show('grp-monthly',   v==='monthly');
+  show('grp-yearly-day',v==='yearly');
+  show('grp-yearly-month',v==='yearly');
+  show('grp-ongoing',   v==='ongoing');
+  // التنبيه فقط للمتكرر
+  show('grp-alert', v==='monthly'||v==='yearly');
+}
+function onAlertToggle(){
+  const on=document.getElementById('f-alert-on').checked;
+  const el=document.getElementById('grp-alert-days');
+  if(el)el.style.display=on?'flex':'none';
+}
+function getScheduleData(){
+  const v=document.getElementById('f-schedule').value;
+  const alertOn=document.getElementById('f-alert-on')?.checked??true;
+  const alertDays=parseInt(document.getElementById('f-alert-days')?.value||'5');
+  if(v==='fixed'){
+    return{schedule:'fixed',start:document.getElementById('f-start').value,end:document.getElementById('f-end').value,alertOn:false,alertDays:0};
+  }
+  if(v==='monthly'){
+    const day=document.getElementById('f-month-day').value;
+    return{schedule:'monthly',scheduleDay:day,start:td(),end:null,alertOn,alertDays,recurLabel:`كل شهر — يوم ${day}`};
+  }
+  if(v==='yearly'){
+    const day=document.getElementById('f-year-day').value;
+    const month=document.getElementById('f-year-month').value;
+    const months=['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    return{schedule:'yearly',scheduleDay:day,scheduleMonth:month,start:td(),end:null,alertOn,alertDays,recurLabel:`كل سنة — ${day} ${months[month]}`};
+  }
+  if(v==='ongoing'){
+    return{schedule:'ongoing',start:document.getElementById('f-ongoing-start').value,end:null,alertOn:false,alertDays:0};
+  }
+  return{schedule:'fixed',start:'',end:'',alertOn:false,alertDays:0};
+}
+function markDone(pid){
+  const p=PROCS.find(x=>x.id===pid);
+  if(!p)return;
+  const now=td();
+  if(!p.doneLog)p.doneLog=[];
+  p.doneLog.push({date:now,by:CU.name});
+  p.lastDone=now;
+  save();
+  renderPT();renderDash();
+  toast('✅ تم تسجيل الإنجاز');
+}
+
+
 function save(){
   fetch('https://api.jsonbin.io/v3/b/6a05689ac0954111d81f6fe3',{
     method:'PUT',
@@ -929,10 +1030,38 @@ function switchTab(id,btn){
 // ═══════════════ HELPERS ═══════════════
 function td(){return new Date().toISOString().slice(0,10);}
 function dl(end){if(!end)return null;return Math.ceil((new Date(end)-new Date(td()))/(864e5));}
-function dstat(status,end){
+function dstat(status,end,proc){
   if(status==='مكتمل')return{l:'✅ مكتمل',c:'badge-done',k:'done'};
   if(status==='ملغى')return{l:'🚫 ملغى',c:'badge-cancel',k:'cancel'};
   if(status==='متوقف')return{l:'⏸️ متوقف',c:'badge-stop',k:'stop'};
+  // أنواع الجدول الزمني الجديدة
+  const sch=proc?.schedule||'fixed';
+  if(sch==='ongoing')return{l:'♾️ مستمر',c:'badge-running',k:'ongoing'};
+  if(sch==='monthly'){
+    const day=parseInt(proc?.scheduleDay||1);
+    const now=new Date();const today=now.getDate();
+    const diff=day-today;
+    const alertDays=proc?.alertDays||5;
+    const alertOn=proc?.alertOn??true;
+    if(!alertOn)return{l:'🔁 شهري',c:'badge-running',k:'monthly'};
+    if(diff<0)return{l:'🔁 شهري',c:'badge-running',k:'monthly'};
+    if(diff<=alertDays)return{l:`🟡 التنفيذ بعد ${diff} يوم`,c:'badge-soon',k:'soon'};
+    return{l:'🔁 شهري',c:'badge-running',k:'monthly'};
+  }
+  if(sch==='yearly'){
+    const day=parseInt(proc?.scheduleDay||1);
+    const month=parseInt(proc?.scheduleMonth||1);
+    const now=new Date();
+    const target=new Date(now.getFullYear(),month-1,day);
+    if(target<now)target.setFullYear(now.getFullYear()+1);
+    const diff=Math.ceil((target-now)/(1000*60*60*24));
+    const alertDays=proc?.alertDays||7;
+    const alertOn=proc?.alertOn??true;
+    if(!alertOn)return{l:'📆 سنوي',c:'badge-running',k:'yearly'};
+    if(diff<=alertDays)return{l:`🟡 التنفيذ بعد ${diff} يوم`,c:'badge-soon',k:'soon'};
+    return{l:'📆 سنوي',c:'badge-running',k:'yearly'};
+  }
+  // fixed
   const d=dl(end);if(d===null)return{l:'—',c:'',k:''};
   if(d<0)return{l:'🔴 متأخر',c:'badge-late',k:'late'};
   if(d<=7)return{l:'🟡 قريب',c:'badge-soon',k:'soon'};
@@ -1090,9 +1219,9 @@ function getFilteredProcs_dash(){
   if(fDept) procs=procs.filter(p=>p.dept===fDept);
   if(fTeam) procs=procs.filter(p=>p.teamId===fTeam);
   if(fStatus) procs=procs.filter(p=>p.status===fStatus);
-  if(fDelay==='late') procs=procs.filter(p=>dstat(p.status,p.end).k==='late');
-  else if(fDelay==='soon') procs=procs.filter(p=>dstat(p.status,p.end).k==='soon');
-  else if(fDelay==='ontime') procs=procs.filter(p=>dstat(p.status,p.end).k==='ontime');
+  if(fDelay==='late') procs=procs.filter(p=>dstat(p.status,p.end,p).k==='late');
+  else if(fDelay==='soon') procs=procs.filter(p=>dstat(p.status,p.end,p).k==='soon');
+  else if(fDelay==='ontime') procs=procs.filter(p=>dstat(p.status,p.end,p).k==='ontime');
   const fDateFrom=document.getElementById('df-date-from')?.value||'';
   const fDateTo=document.getElementById('df-date-to')?.value||'';
   if(fDateFrom) procs=procs.filter(p=>p.end&&p.end>=fDateFrom);
@@ -1135,8 +1264,8 @@ function renderKPIs(procs){
   const done    = procs.filter(p=>p.status==='مكتمل').length;
   const running = procs.filter(p=>p.status==='قيد التشغيل').length;
   const stopped = procs.filter(p=>p.status==='متوقف').length;
-  const late    = procs.filter(p=>dstat(p.status,p.end).k==='late').length;
-  const soon    = procs.filter(p=>dstat(p.status,p.end).k==='soon').length;
+  const late    = procs.filter(p=>dstat(p.status,p.end,p).k==='late').length;
+  const soon    = procs.filter(p=>dstat(p.status,p.end,p).k==='soon').length;
   const notyet  = procs.filter(p=>p.status==='لم تبدأ').length;
   const totalOps= procs.reduce((a,p)=>a+(p.operations||[]).length,0);
   const doneOps = procs.reduce((a,p)=>a+(p.operations||[]).filter(o=>o.status==='مكتمل').length,0);
@@ -1197,8 +1326,8 @@ function renderCharts_filtered(procs){
   const done    = procs.filter(p=>p.status==='مكتمل').length;
   const running = procs.filter(p=>p.status==='قيد التشغيل').length;
   const stopped = procs.filter(p=>p.status==='متوقف').length;
-  const late    = procs.filter(p=>dstat(p.status,p.end).k==='late').length;
-  const soon    = procs.filter(p=>dstat(p.status,p.end).k==='soon').length;
+  const late    = procs.filter(p=>dstat(p.status,p.end,p).k==='late').length;
+  const soon    = procs.filter(p=>dstat(p.status,p.end,p).k==='soon').length;
   const notyet  = procs.filter(p=>p.status==='لم تبدأ').length;
   renderCharts(procs,done,running,late,soon,notyet,stopped);
 }
@@ -1654,14 +1783,35 @@ function toggleAdd(){
 function saveProc(){
   const name=document.getElementById('f-name').value.trim();
   const dept=document.getElementById('f-dept').value;
-  const start=document.getElementById('f-start').value;
-  const end=document.getElementById('f-end').value;
   const teamId=document.getElementById('f-team').value;
-  if(!name||(!dept&&!teamId)||!start||!end){toast('⚠️ يرجى ملء الحقول الإلزامية — الدائرة أو الفريق مطلوب',true);return;}
+  const sched=getScheduleData();
+  // تحقق من الحقول الإلزامية
+  if(!name||(!dept&&!teamId)){toast('⚠️ يرجى ملء الحقول الإلزامية — الدائرة أو الفريق مطلوب',true);return;}
+  if(sched.schedule==='fixed'&&(!sched.start||!sched.end)){toast('⚠️ يرجى تحديد تاريخ البداية والنهاية',true);return;}
+  if(sched.schedule==='ongoing'&&!sched.start){toast('⚠️ يرجى تحديد تاريخ البداية',true);return;}
   const teamName=TEAMS_DB.find(t=>t.id===teamId)?.name||'';
-  PROCS.push({id:Date.now(),name,dept,teamId,team:teamName,type:document.getElementById('f-type').value,start,end,status:'لم تبدأ',notes:document.getElementById('f-notes').value,operations:collectOps(),addedBy:CU.id,addedName:CU.name,addedDate:td()});
+  PROCS.push({
+    id:Date.now(),name,dept,teamId,team:teamName,
+    type:document.getElementById('f-type').value,
+    start:sched.start||td(),end:sched.end||null,
+    schedule:sched.schedule||'fixed',
+    scheduleDay:sched.scheduleDay||null,
+    scheduleMonth:sched.scheduleMonth||null,
+    recurLabel:sched.recurLabel||null,
+    alertOn:sched.alertOn??false,
+    alertDays:sched.alertDays||0,
+    doneLog:[],lastDone:null,
+    status:'لم تبدأ',
+    notes:document.getElementById('f-notes').value,
+    operations:collectOps(),
+    addedBy:CU.id,addedName:CU.name,addedDate:td()
+  });
   save();
-  ['f-name','f-dept','f-start','f-end','f-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['f-name','f-dept','f-notes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const fs=document.getElementById('f-start');if(fs)fs.value='';
+  const fe=document.getElementById('f-end');if(fe)fe.value='';
+  document.getElementById('f-schedule').value='fixed';
+  onScheduleChange();
   document.getElementById('ops-container').innerHTML='';opCount=0;currentOpPool=[];
   toggleAdd();renderPT();renderDash();
   toast('✅ تم حفظ الإجراء');
@@ -1680,7 +1830,7 @@ function renderPT(){
   const tbody=document.getElementById('proc-tbody');if(!tbody)return;tbody.innerHTML='';
   if(!procs.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--mgray)">لا توجد إجراءات</td></tr>';return;}
   procs.forEach((p,i)=>{
-    const d=dstat(p.status,p.end);const pc=pct(p);
+    const d=dstat(p.status,p.end,p);const pc=pct(p);
     const canEdit=['Admin','Manager','Section Head'].includes(CU.role);
     const canDel=canEdit;
     const exp=expandedRows.has(p.id);
@@ -1693,12 +1843,13 @@ function renderPT(){
         <td style="font-weight:700;color:var(--navy)">${p.name}</td>
         <td style="font-size:12px">${p.dept}${teamL}</td>
         <td style="font-size:12px">${p.start||'—'}</td>
-        <td style="font-size:12px">${p.end||'—'}</td>
+        <td style="font-size:12px">${p.schedule==='monthly'?`🔁 يوم ${p.scheduleDay}`:p.schedule==='yearly'?`📆 ${p.recurLabel||'سنوي'}`:p.schedule==='ongoing'?'♾️ مستمر':p.end||'—'}</td>
         <td>${sb(p.status)}</td>
         <td><span class="badge ${d.c}">${d.l}</span></td>
         <td><div style="display:flex;align-items:center;gap:5px;min-width:80px"><div class="pbar" style="flex:1"><div class="pfill" style="width:${pc}%"></div></div><span style="font-size:11px;font-weight:700">${pc}%</span></div></td>
         <td style="text-align:center" onclick="event.stopPropagation()"><span class="badge" style="background:#e0f2fe;color:#0369a1;cursor:pointer" onclick="toggleExp(${p.id})">⚙️ ${opsC}</span></td>
         <td style="white-space:nowrap" onclick="event.stopPropagation()">
+          ${(p.schedule==='monthly'||p.schedule==='yearly')?`<button class="btn btn-sm" style="background:#27AE60;color:#fff;margin-left:4px" onclick="markDone(${p.id})" title="تسجيل إنجاز">✅</button>`:''}
           ${canEdit?`<button class="btn btn-primary btn-sm" onclick="openEp(${p.id})">✏️</button>`:''}
           ${canDel?`<button class="btn btn-danger btn-sm" onclick="delProc(${p.id})" style="margin-right:4px">🗑️</button>`:''}
         </td>
@@ -1913,8 +2064,8 @@ function saveOpUpd(){
 // ═══════════════ ALERTS ═══════════════
 function renderAlerts(){
   const procs=getVis();
-  const late=procs.filter(p=>dstat(p.status,p.end).k==='late');
-  const soon=procs.filter(p=>dstat(p.status,p.end).k==='soon');
+  const late=procs.filter(p=>dstat(p.status,p.end,p).k==='late');
+  const soon=procs.filter(p=>dstat(p.status,p.end,p).k==='soon');
   document.getElementById('lc').textContent=late.length;
   document.getElementById('sc').textContent=soon.length;
   document.getElementById('al-late').innerHTML=late.length?late.map(p=>`
@@ -1933,7 +2084,7 @@ function renderAlerts(){
 function buildRepHTML(procs){
   if(!procs.length)return'<div class="empty"><div class="icon">📄</div><p>لا توجد بيانات</p></div>';
   return procs.map(p=>{
-    const d=dstat(p.status,p.end);const pc=pct(p);const ops=p.operations||[];
+    const d=dstat(p.status,p.end,p);const pc=pct(p);const ops=p.operations||[];
     const opsDoneCount=ops.filter(o=>o.status==='مكتمل').length;
     return`<div class="report-proc">
       <div class="report-proc-hdr">
@@ -1997,9 +2148,9 @@ function getFilteredProcs(){
   if(dept)   procs=procs.filter(p=>p.dept===dept);
   if(teamId) procs=procs.filter(p=>p.teamId===teamId);
   if(status) procs=procs.filter(p=>p.status===status);
-  if(delay==='late')   procs=procs.filter(p=>dstat(p.status,p.end).k==='late');
-  else if(delay==='soon')   procs=procs.filter(p=>dstat(p.status,p.end).k==='soon');
-  else if(delay==='ontime') procs=procs.filter(p=>dstat(p.status,p.end).k==='ontime');
+  if(delay==='late')   procs=procs.filter(p=>dstat(p.status,p.end,p).k==='late');
+  else if(delay==='soon')   procs=procs.filter(p=>dstat(p.status,p.end,p).k==='soon');
+  else if(delay==='ontime') procs=procs.filter(p=>dstat(p.status,p.end,p).k==='ontime');
   if(dateFrom) procs=procs.filter(p=>p.end&&p.end>=dateFrom);
   if(dateTo)   procs=procs.filter(p=>p.end&&p.end<=dateTo);
   if(q) procs=procs.filter(p=>p.name.toLowerCase().includes(q)||p.dept.toLowerCase().includes(q)||(p.team||'').toLowerCase().includes(q));
@@ -2013,7 +2164,7 @@ function renderReport(){
   if(sumEl)sumEl.innerHTML=`
     <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:13px;padding:6px 14px">📋 ${procs.length} إجراء</span>
     <span class="badge" style="background:#dcfce7;color:#166534;font-size:13px;padding:6px 14px">✅ ${procs.filter(p=>p.status==='مكتمل').length} مكتمل</span>
-    <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:13px;padding:6px 14px">🔴 ${procs.filter(p=>dstat(p.status,p.end).k==='late').length} متأخر</span>
+    <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:13px;padding:6px 14px">🔴 ${procs.filter(p=>dstat(p.status,p.end,p).k==='late').length} متأخر</span>
     <span class="badge" style="background:#ede9fe;color:#4c1d95;font-size:13px;padding:6px 14px">⚙️ ${totalOps} عملية</span>`;
   const sc=document.getElementById('report-screen-content');
   if(sc)sc.innerHTML=buildRepHTML(procs);
