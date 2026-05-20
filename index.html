@@ -2368,8 +2368,22 @@ function renderMyOps(){
       // بطاقة عملية عادية
       const d=dstat(op.status,op.end,p);const cls=d.k==='late'?'late':d.k==='soon'?'soon':'';
       div.className=`my-op-card ${cls}`;
+      // تحديد مصدر العملية: فريق أم دائرة
+      const team=p.teamId?TEAMS_DB.find(t=>t.id===p.teamId):null;
+      const teamLeader=team?USERS.find(u=>u.id===team.leaderId):null;
+      const isTeamOp=!!team;
+      const sourceTag=isTeamOp
+        ?`<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#5b21b6;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;border:1px solid #c4b5fd">
+            👥 فريق عمل: ${team.name}${teamLeader?` — 👑 ${teamLeader.name.split(' ').slice(0,2).join(' ')}`:''}
+          </span>`
+        :`<span style="display:inline-flex;align-items:center;gap:4px;background:#dbeafe;color:#1e40af;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;border:1px solid #bfdbfe">
+            🏢 دائرة: ${p.dept}
+          </span>`;
       div.innerHTML=`
-        <div style="font-size:11px;color:var(--mgray);margin-bottom:4px">📋 ${p.name} — ${p.dept}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+          <div style="font-size:11px;color:var(--mgray)">📋 ${p.name}</div>
+          ${sourceTag}
+        </div>
         <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">⚙️ ${op.name}</div>
         <div style="font-size:12px;color:var(--mgray);margin-bottom:8px">${op.start?`البداية: ${op.start} | `:''}${op.end?`النهاية: ${op.end}`:''}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${sb(op.status)}<span class="badge ${d.c}">${d.l}</span></div>
