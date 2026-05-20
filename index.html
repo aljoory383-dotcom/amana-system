@@ -369,6 +369,38 @@ tbody td{padding:11px 14px;color:var(--dgray);}
   .cp-proc-stats{flex-wrap:wrap;}
   .cp-stat{min-width:80px;}
 }
+
+/* ═══════════════ NOTIFICATIONS ═══════════════ */
+.notif-panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;}
+.notif-panel-hdr{padding:16px 20px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.notif-panel-hdr h3{font-size:15px;font-weight:800;color:#fff;}
+.notif-panel-body{padding:20px;}
+.notif-send-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;}
+.notif-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:10px;margin-bottom:10px;border-right:4px solid transparent;transition:box-shadow .18s;}
+.notif-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.1);}
+.notif-item.unread{background:#fffbeb;border-right-color:var(--gold);}
+.notif-item.read{background:#f8fafc;border-right-color:#e2e8f0;}
+.notif-item.urgent{background:#fff1f2;border-right-color:var(--red);}
+.notif-item.info{background:#eff6ff;border-right-color:var(--blue);}
+.notif-av{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;}
+.notif-av.urgent{background:var(--red);}
+.notif-av.info{background:var(--blue);}
+.notif-body{flex:1;}
+.notif-from{font-size:11px;color:var(--mgray);font-weight:600;margin-bottom:3px;}
+.notif-msg{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;line-height:1.5;}
+.notif-meta{font-size:11px;color:var(--mgray);display:flex;gap:10px;flex-wrap:wrap;}
+.notif-badge-unread{background:var(--gold);color:var(--navy2);border-radius:99px;padding:1px 8px;font-size:10px;font-weight:800;}
+.notif-actions{display:flex;gap:6px;margin-top:8px;}
+.btn-notif-read{background:var(--gray);color:var(--dgray);border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:600;}
+.btn-notif-read:hover{background:var(--gray2);}
+.notif-type-urgent .notif-av{background:var(--red);}
+.notif-send-btn{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:700;border-bottom:2px solid var(--gold);}
+.notif-send-btn:hover{opacity:.9;}
+.auto-notif-btn{background:linear-gradient(135deg,var(--red),#dc2626);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:700;}
+.auto-notif-btn:hover{opacity:.9;}
+.notif-counter{background:var(--red);color:#fff;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:800;min-width:20px;text-align:center;}
+.inbox-empty{text-align:center;padding:32px;color:var(--mgray);}
+.inbox-empty .icon{font-size:48px;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -582,6 +614,57 @@ tbody td{padding:11px 14px;color:var(--dgray);}
 
     <!-- ALERTS TAB -->
     <div class="tab-content" id="tab-alerts">
+
+      <!-- قسم إرسال إشعارات — للمدراء فقط -->
+      <div id="notif-mgr-section" style="display:none">
+        <div class="notif-panel">
+          <div class="notif-panel-hdr">
+            <h3>📣 إرسال إشعار تنبيهي</h3>
+          </div>
+          <div class="notif-panel-body">
+            <div class="notif-send-form">
+              <div class="form-group">
+                <label>نوع الإشعار</label>
+                <select id="notif-type" style="width:100%;padding:10px;border:2px solid var(--gray2);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;">
+                  <option value="urgent">🚨 عاجل — تأخير في إجراء</option>
+                  <option value="reminder">🔔 تذكير — موعد اقتراب</option>
+                  <option value="info">ℹ️ معلومات عامة</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>المستلم</label>
+                <select id="notif-to" style="width:100%;padding:10px;border:2px solid var(--gray2);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;">
+                  <option value="all">📢 الكل</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column:1/-1">
+                <label>نص الإشعار <span class="req">*</span></label>
+                <textarea id="notif-msg" placeholder="اكتب نص الإشعار هنا..." style="width:100%;padding:10px;border:2px solid var(--gray2);border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;min-height:80px;resize:vertical;outline:none;"></textarea>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+              <button class="notif-send-btn" onclick="sendNotif()">📤 إرسال الإشعار</button>
+              <button class="auto-notif-btn" onclick="sendAutoLateNotifs()">🤖 إشعار تلقائي للمتأخرين</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- صندوق الوارد -->
+      <div class="notif-panel">
+        <div class="notif-panel-hdr">
+          <h3>📬 إشعاراتي <span id="unread-count-badge"></span></h3>
+          <div style="display:flex;gap:8px">
+            <button onclick="markAllRead()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:12px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:600;">✅ تحديد الكل كمقروء</button>
+            <button onclick="clearMyNotifs()" style="background:rgba(185,28,28,.2);color:#fca5a5;border:1px solid rgba(185,28,28,.4);border-radius:7px;padding:6px 12px;font-size:12px;font-family:'Tajawal',sans-serif;cursor:pointer;font-weight:600;">🗑️ مسح إشعاراتي</button>
+          </div>
+        </div>
+        <div class="notif-panel-body" id="my-notifs-list">
+          <div class="inbox-empty"><div class="icon">📭</div><p>لا توجد إشعارات</p></div>
+        </div>
+      </div>
+
+      <!-- التنبيهات القديمة -->
       <div class="card late" style="border-right:5px solid var(--red)">
         <div class="card-header"><h3>🔴 إجراءات متأخرة (<span id="lc">0</span>)</h3></div>
         <div class="card-body"><div id="al-late"></div></div>
@@ -816,6 +899,7 @@ let USERS=[
 ];
 let TEAMS_DB=[];
 let PROCS=[];
+let NOTIFICATIONS=[];
 let CU=null;
 let opCount=0;
 let expandedRows=new Set();
@@ -833,8 +917,16 @@ function onScheduleChange(){
   show('grp-yearly-day',v==='yearly');
   show('grp-yearly-month',v==='yearly');
   show('grp-ongoing',   v==='ongoing');
-  // التنبيه فقط للمتكرر
   show('grp-alert', v==='monthly'||v==='yearly');
+  // إعادة رسم العمليات الموجودة لتحديث ظهور التواريخ
+  const ops=document.querySelectorAll('.op-item');
+  if(ops.length>0){
+    // نجمع بيانات العمليات الحالية ونعيد رسمها
+    const existing=collectOps();
+    document.getElementById('ops-container').innerHTML='';
+    opCount=0;
+    existing.forEach(op=>addOp(op));
+  }
 }
 function onAlertToggle(){
   const on=document.getElementById('f-alert-on').checked;
@@ -876,16 +968,191 @@ function markDone(pid){
 }
 
 
+// ═══════════════ CYCLE SYSTEM ═══════════════
+
+// بدء دورة جديدة (للمدير فقط)
+function startCycle(pid){
+  const p=PROCS.find(x=>x.id===pid);
+  if(!p)return;
+  const isMgr=['Admin','Manager','Section Head','Top Management'].includes(CU.role);
+  if(!isMgr){toast('⚠️ فقط المدير يستطيع بدء دورة جديدة',true);return;}
+  if(!p.operations||!p.operations.length){toast('⚠️ لا توجد عمليات في هذا الإجراء',true);return;}
+
+  // حفظ الدورة السابقة إذا وجدت
+  if(!p.cycles)p.cycles=[];
+  const activeCycle=p.cycles.find(cy=>cy.status==='active');
+  if(activeCycle){
+    if(!confirm('يوجد دورة نشطة حالياً. هل تريدين إنهاءها وبدء جديدة؟'))return;
+    activeCycle.status='completed';
+    activeCycle.endDate=td();
+  }
+
+  // إنشاء دورة جديدة
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const now=new Date();
+  let label='';
+  if(p.schedule==='monthly') label=`${months[now.getMonth()]} ${now.getFullYear()}`;
+  else if(p.schedule==='yearly') label=`${now.getFullYear()}`;
+  else label=td();
+
+  const cycleOps=p.operations.map(op=>({
+    opId:op.id,opName:op.name,
+    assignedIds:op.assignedIds||[],
+    assignedNames:op.assignedNames||[],
+    status:'لم تبدأ',doneDate:null,doneBy:null
+  }));
+
+  p.cycles.push({
+    id:Date.now(),label,startDate:td(),endDate:null,
+    status:'active',startedBy:CU.name,ops:cycleOps
+  });
+
+  save();renderPT();renderDash();
+  toast(`✅ تم بدء دورة: ${label}`);
+}
+
+// إنهاء الدورة الحالية
+function endCycle(pid){
+  const p=PROCS.find(x=>x.id===pid);if(!p)return;
+  const cy=(p.cycles||[]).find(c=>c.status==='active');
+  if(!cy){toast('لا توجد دورة نشطة',true);return;}
+  if(!confirm('هل تريدين إنهاء الدورة الحالية؟'))return;
+  cy.status='completed';cy.endDate=td();
+  save();renderPT();renderDash();
+  toast('✅ تم إنهاء الدورة');
+}
+
+// تحديث حالة عملية في الدورة (للموظف)
+function updateCycleOp(pid,cycleId,opId,newStatus){
+  const p=PROCS.find(x=>x.id===pid);if(!p)return;
+  const cy=(p.cycles||[]).find(c=>c.id===cycleId);if(!cy)return;
+  const op=cy.ops.find(o=>o.opId===opId);if(!op)return;
+  // تحقق أن الموظف مُعيَّن في هذه العملية
+  if(!op.assignedIds.includes(CU.id)&&!['Admin','Manager','Section Head','Top Management'].includes(CU.role)){
+    toast('⚠️ لست مُعيَّناً في هذه العملية',true);return;
+  }
+  op.status=newStatus;
+  if(newStatus==='مكتمل'){op.doneDate=td();op.doneBy=CU.name;}
+  else{op.doneDate=null;op.doneBy=null;}
+  save();renderPT();renderMyOps();
+  toast('✅ تم تحديث حالة العملية');
+}
+
+// عرض الدورات في صف الإجراء
+function renderCycles(p){
+  const cycles=p.cycles||[];
+  const activeCy=cycles.find(cy=>cy.status==='active');
+  const isMgr=['Admin','Manager','Section Head','Top Management'].includes(CU.role);
+  const sch=p.schedule;
+
+  // للمستمر — عرض حالة العمليات مباشرة
+  if(sch==='ongoing'){
+    const ops=p.operations||[];
+    if(!ops.length)return'<div style="color:var(--mgray);font-size:13px;padding:8px">لا توجد عمليات</div>';
+    return`<div style="margin-top:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">⚙️ العمليات المستمرة</div>
+      ${ops.map(op=>{
+        const isAssigned=op.assignedIds?.includes(CU.id);
+        const canUpd=isAssigned||isMgr;
+        return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eee;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600;flex:1;min-width:120px">${op.name}</span>
+          <span style="font-size:11px;color:var(--mgray)">${(op.assignedNames||[]).join('، ')||'—'}</span>
+          ${sb(op.status)}
+          ${canUpd?`<select onchange="updateOngoingOp(${p.id},${op.id},this.value)" style="font-size:11px;padding:3px 6px;border:1px solid #ccc;border-radius:6px;font-family:'Tajawal',sans-serif">
+            <option value="لم تبدأ" ${op.status==='لم تبدأ'?'selected':''}>لم تبدأ</option>
+            <option value="قيد التشغيل" ${op.status==='قيد التشغيل'?'selected':''}>قيد التشغيل</option>
+            <option value="مكتمل" ${op.status==='مكتمل'?'selected':''}>مكتمل</option>
+            <option value="متوقف" ${op.status==='متوقف'?'selected':''}>متوقف</option>
+          </select>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // للمتكرر — عرض الدورة النشطة
+  if(sch==='monthly'||sch==='yearly'){
+    let html='<div style="margin-top:8px">';
+
+    // سجل الدورات السابقة
+    const done=cycles.filter(cy=>cy.status==='completed');
+    if(done.length){
+      html+=`<details style="margin-bottom:8px"><summary style="cursor:pointer;font-size:12px;color:var(--mgray)">📋 سجل الدورات السابقة (${done.length})</summary>
+        <div style="padding:8px;background:#f8f9fa;border-radius:8px;margin-top:4px">
+        ${done.map(cy=>{
+          const total=cy.ops.length;
+          const doneOps=cy.ops.filter(o=>o.status==='مكتمل').length;
+          return`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee;font-size:12px">
+            <span>${cy.label}</span>
+            <span style="color:var(--mgray)">${cy.startDate} ← ${cy.endDate||'—'}</span>
+            <span style="color:${doneOps===total?'#27AE60':'#E67E22'}">${doneOps}/${total} مكتمل</span>
+          </div>`;
+        }).join('')}
+        </div></details>`;
+    }
+
+    if(activeCy){
+      const total=activeCy.ops.length;
+      const doneCount=activeCy.ops.filter(o=>o.status==='مكتمل').length;
+      const pct=total?Math.round(doneCount/total*100):0;
+      html+=`<div style="background:#EEF7FF;border-radius:8px;padding:10px;border:1px solid #BDD5F0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:13px;font-weight:700;color:var(--navy)">🔄 دورة: ${activeCy.label}</span>
+          <span style="font-size:12px;color:var(--mgray)">بدأت: ${activeCy.startDate}</span>
+          <span style="font-weight:700;color:${pct===100?'#27AE60':'#E67E22'}">${pct}%</span>
+        </div>
+        <div style="height:6px;background:#dde;border-radius:3px;margin-bottom:8px">
+          <div style="height:6px;background:${pct===100?'#27AE60':'#1A2F5A'};border-radius:3px;width:${pct}%"></div>
+        </div>
+        ${activeCy.ops.map(op=>{
+          const isAssigned=op.assignedIds?.includes(CU.id);
+          const canUpd=isAssigned||isMgr;
+          return`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #dde;flex-wrap:wrap">
+            <span style="font-size:13px;flex:1;min-width:100px">${op.opName}</span>
+            <span style="font-size:11px;color:var(--mgray)">${(op.assignedNames||[]).join('، ')||'—'}</span>
+            ${sb(op.status)}
+            ${op.doneDate?`<span style="font-size:10px;color:#27AE60">✓ ${op.doneDate}</span>`:''}
+            ${canUpd&&op.status!=='مكتمل'?`<button onclick="updateCycleOp(${p.id},${activeCy.id},${op.opId},'مكتمل')" style="background:#27AE60;color:#fff;border:none;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:'Tajawal',sans-serif">✅ تم</button>`:''}
+            ${canUpd&&op.status==='مكتمل'?`<button onclick="updateCycleOp(${p.id},${activeCy.id},${op.opId},'قيد التشغيل')" style="background:#E67E22;color:#fff;border:none;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-family:'Tajawal',sans-serif">↩️ تراجع</button>`:''}
+          </div>`;
+        }).join('')}
+        ${isMgr?`<button onclick="endCycle(${p.id})" style="margin-top:8px;background:#E74C3C;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;font-family:'Tajawal',sans-serif">⏹ إنهاء الدورة</button>`:''}
+      </div>`;
+    } else {
+      html+=`<div style="text-align:center;padding:12px;background:#f8f9fa;border-radius:8px;border:2px dashed #ccc">
+        <div style="color:var(--mgray);font-size:13px;margin-bottom:8px">لا توجد دورة نشطة حالياً</div>
+        ${isMgr?`<button onclick="startCycle(${p.id})" style="background:#1A2F5A;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:'Tajawal',sans-serif">▶️ بدء دورة جديدة</button>`:'<div style="font-size:12px;color:var(--mgray)">انتظري المدير لبدء الدورة</div>'}
+      </div>`;
+    }
+    html+='</div>';
+    return html;
+  }
+
+  // fixed / عادي — العمليات الأصلية
+  return renderCycles(p);
+}
+
+// تحديث حالة عملية مستمرة
+function updateOngoingOp(pid,opId,newStatus){
+  const p=PROCS.find(x=>x.id===pid);if(!p)return;
+  const op=(p.operations||[]).find(o=>o.id===opId);if(!op)return;
+  op.status=newStatus;
+  save();renderPT();renderMyOps();
+  toast('✅ تم تحديث الحالة');
+}
+
+
 function save(){
+  const payload={procs:PROCS,users:USERS,teams:TEAMS_DB,notifications:NOTIFICATIONS};
   fetch('https://api.jsonbin.io/v3/b/6a05689ac0954111d81f6fe3',{
     method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':'$2a$10$BudsP8SrM9iNKAbl9ZhZKuzGUGVTXBGnSK8Lckh/V3k8rzQk/TUem'},
-    body:JSON.stringify({procs:PROCS,users:USERS,teams:TEAMS_DB})
+    body:JSON.stringify(payload)
   }).then(()=>{
     try{
       localStorage.setItem('procs_v4',JSON.stringify(PROCS));
       localStorage.setItem('users_v4',JSON.stringify(USERS));
       localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
+      localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
     }catch(e){}
   }).catch(e=>{
     console.warn('JSONBin save failed:',e);
@@ -893,6 +1160,7 @@ function save(){
       localStorage.setItem('procs_v4',JSON.stringify(PROCS));
       localStorage.setItem('users_v4',JSON.stringify(USERS));
       localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
+      localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
     }catch(e2){}
   });
 }
@@ -907,6 +1175,7 @@ async function load(){
       if(rec.users&&rec.users.length)USERS=rec.users;
       if(rec.procs)PROCS=rec.procs;
       if(rec.teams)TEAMS_DB=rec.teams;
+      if(rec.notifications)NOTIFICATIONS=rec.notifications;
       return;
     }
   }catch(e){console.warn('JSONBin load failed:',e);}
@@ -914,6 +1183,7 @@ async function load(){
     const u=localStorage.getItem('users_v4');if(u)USERS=JSON.parse(u);
     PROCS=JSON.parse(localStorage.getItem('procs_v4')||'[]');
     TEAMS_DB=JSON.parse(localStorage.getItem('teams_v4')||'[]');
+    NOTIFICATIONS=JSON.parse(localStorage.getItem('notifs_v4')||'[]');
   }catch(e){}
 }
 
@@ -1001,6 +1271,7 @@ function initApp(){
   if(apc)apc.style.display=['Manager','Section Head','Admin'].includes(CU.role)?'block':'none';
 
   switchTab(tabDefs[0].id);
+  setTimeout(updateAlertTabBadge,100);
 }
 function getDepts(){return[...new Set(USERS.map(u=>u.dept))].sort();}
 function refreshTeamSelect(){
@@ -1025,6 +1296,16 @@ function switchTab(id,btn){
   if(id==='alerts')renderAlerts();
   if(id==='report')renderReport();
   if(id==='admin'){renderUsers();renderTeams();}
+  updateAlertTabBadge();
+}
+function updateAlertTabBadge(){
+  const unread=getUnreadCount?getUnreadCount():0;
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    if(b.textContent.includes('التنبيهات')){
+      b.textContent='';
+      b.innerHTML='🚨 التنبيهات'+(unread>0?` <span style="background:var(--red);color:#fff;border-radius:99px;padding:0 6px;font-size:10px;font-weight:800">${unread}</span>`:'');
+    }
+  });
 }
 
 // ═══════════════ HELPERS ═══════════════
@@ -1077,8 +1358,18 @@ function getVis(){
     const myTeamIds=TEAMS_DB.filter(t=>t.leaderId===CU.id).map(t=>t.id);
     return PROCS.filter(p=>p.dept===d||(p.teamId&&myTeamIds.includes(p.teamId)));
   }
-  // Employee: procs where assigned in any operation
-  return PROCS.filter(p=>(p.operations||[]).some(op=>(op.assignedIds||[]).includes(CU.id)));
+  // Employee: procs where assigned in any operation OR in active cycle
+  return PROCS.filter(p=>{
+    // تحقق من العمليات العادية
+    const inOps=(p.operations||[]).some(op=>(op.assignedIds||[]).includes(CU.id));
+    if(inOps)return true;
+    // تحقق من الدورة النشطة للمتكرر
+    const activeCy=(p.cycles||[]).find(cy=>cy.status==='active');
+    if(activeCy){
+      return activeCy.ops.some(op=>(op.assignedIds||[]).includes(CU.id));
+    }
+    return false;
+  });
 }
 function toast(msg,err=false){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast'+(err?' err':'')+' show';setTimeout(()=>t.classList.remove('show'),2500);}
 function cm(id){document.getElementById(id).classList.remove('open');}
@@ -1150,6 +1441,9 @@ function addOp(data={}){
   opCount++;
   const cid=`opemps-${opCount}`;
   const pool=currentOpPool.length?currentOpPool:USERS;
+  // نتحقق من نوع الجدول الزمني لإخفاء التواريخ
+  const schedType=document.getElementById('f-schedule')?.value||'fixed';
+  const showDates=schedType==='fixed';
   const div=document.createElement('div');div.className='op-item';div.id=`op-${opCount}`;
   div.innerHTML=`
     <div class="op-item-hdr">
@@ -1158,8 +1452,9 @@ function addOp(data={}){
     </div>
     <div class="form-grid">
       <div class="form-group"><label>اسم العملية <span class="req">*</span></label><input type="text" class="op-n" placeholder="اسم العملية" value="${data.name||''}"></div>
+      ${showDates?`
       <div class="form-group"><label>تاريخ البداية</label><input type="date" class="op-s" value="${data.start||''}"></div>
-      <div class="form-group"><label>تاريخ النهاية</label><input type="date" class="op-e" value="${data.end||''}"></div>
+      <div class="form-group"><label>تاريخ النهاية</label><input type="date" class="op-e" value="${data.end||''}"></div>`:''}
       <div class="form-group"><label>الحالة</label><select class="op-st">${['لم تبدأ','قيد التشغيل','متوقف','مكتمل','ملغى'].map(s=>`<option ${(data.status||'لم تبدأ')===s?'selected':''}>${s}</option>`).join('')}</select></div>
       <div class="form-group" style="grid-column:1/-1"><label>وصف العملية</label><textarea class="op-d" placeholder="وصف تفصيلي...">${data.desc||''}</textarea></div>
       <div class="form-group" style="grid-column:1/-1">
@@ -1176,7 +1471,20 @@ function collectOps(){
     const name=item.querySelector('.op-n').value.trim();if(!name)return null;
     const cid=item.querySelector('[id^="opemps-"]')?.id;
     const assignedIds=cid?getSel(cid):[];
-    return{id:Date.now()*100+i,name,start:item.querySelector('.op-s').value,end:item.querySelector('.op-e').value,status:item.querySelector('.op-st').value,desc:item.querySelector('.op-d').value,assignedIds,assignedNames:assignedIds.map(id=>USERS.find(u=>u.id===id)?.name||id),ach:'',chal:'',sugg:''};
+    // التواريخ اختيارية — قد لا تكون موجودة للمتكرر والمستمر
+    const startEl=item.querySelector('.op-s');
+    const endEl=item.querySelector('.op-e');
+    return{
+      id:Date.now()*100+i,
+      name,
+      start:startEl?startEl.value:'',
+      end:endEl?endEl.value:'',
+      status:item.querySelector('.op-st').value,
+      desc:item.querySelector('.op-d')?.value||'',
+      assignedIds,
+      assignedNames:assignedIds.map(id=>USERS.find(u=>u.id===id)?.name||id),
+      ach:'',chal:'',sugg:''
+    };
   }).filter(Boolean);
 }
 
@@ -1858,13 +2166,13 @@ function renderPT(){
         <td colspan="11">
           <div class="exp-inner">
             <strong style="color:var(--navy);font-size:13px">⚙️ عمليات الإجراء: ${p.name}</strong>
-            ${renderOpsD(p)}
+            ${renderCycles(p)}
           </div>
         </td>
       </tr>`;
   });
 }
-function renderOpsD(p){
+function renderCycles(p){
   const ops=p.operations||[];
   if(!ops.length)return'<div style="color:var(--mgray);font-size:13px;padding:10px 0">لا توجد عمليات مضافة</div>';
   return'<div style="margin-top:12px">'+ops.map((op,i)=>{
@@ -2003,27 +2311,72 @@ function renderMyOps(){
   const c=document.getElementById('myops-c');c.innerHTML='';
   const myOps=[];
   PROCS.forEach(p=>{
+    const sch=p.schedule||'fixed';
+    // للمتكرر: نبحث في الدورة النشطة
+    if(sch==='monthly'||sch==='yearly'){
+      const activeCy=(p.cycles||[]).find(cy=>cy.status==='active');
+      // تحقق أن الموظف مُعيَّن في هذا الإجراء
+      const isAssigned=(p.operations||[]).some(op=>(op.assignedIds||[]).includes(CU.id));
+      if(!isAssigned)return;
+      if(activeCy){
+        activeCy.ops.forEach(op=>{
+          if(!(op.assignedIds||[]).includes(CU.id))return;
+          if(q&&!op.opName.toLowerCase().includes(q)&&!p.name.toLowerCase().includes(q))return;
+          if(fs&&op.status!==fs)return;
+          myOps.push({p,op,isCycle:true,cycleId:activeCy.id,cycleLabel:activeCy.label});
+        });
+      } else {
+        // لا توجد دورة نشطة — نعرض رسالة للموظف
+        if(q&&!p.name.toLowerCase().includes(q))return;
+        myOps.push({p,op:null,isCycle:true,cycleId:null,cycleLabel:null,noCycle:true});
+      }
+      return;
+    }
+    // للمستمر والمحدد: عمليات عادية
     (p.operations||[]).forEach(op=>{
       if((op.assignedIds||[]).includes(CU.id)){
         if(q&&!op.name.toLowerCase().includes(q)&&!p.name.toLowerCase().includes(q))return;
         if(fs&&op.status!==fs)return;
-        myOps.push({p,op});
+        myOps.push({p,op,isCycle:false});
       }
     });
   });
   if(!myOps.length){c.innerHTML='<div class="empty"><div class="icon">📭</div><p>لا توجد عمليات مسندة إليك</p></div>';return;}
   myOps.sort((a,b)=>{const order={late:0,soon:1,ontime:2,done:3,cancel:4,stop:5,notyet:6};const ka=dstat(a.op.status,a.op.end).k;const kb=dstat(b.op.status,b.op.end).k;return(order[ka]??9)-(order[kb]??9);});
-  myOps.forEach(({p,op})=>{
-    const d=dstat(op.status,op.end);const cls=d.k==='late'?'late':d.k==='soon'?'soon':'';
-    const div=document.createElement('div');div.className=`my-op-card ${cls}`;
-    div.innerHTML=`
-      <div style="font-size:11px;color:var(--mgray);margin-bottom:4px">📋 ${p.name} — ${p.dept}</div>
-      <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">⚙️ ${op.name}</div>
-      <div style="font-size:12px;color:var(--mgray);margin-bottom:8px">${op.start?`البداية: ${op.start} | `:''}${op.end?`النهاية: ${op.end}`:''}</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${sb(op.status)}<span class="badge ${d.c}">${d.l}</span></div>
-      ${op.ach?`<div style="font-size:12px;color:var(--green);margin-bottom:4px">✅ ${op.ach}</div>`:''}
-      ${op.chal?`<div style="font-size:12px;color:var(--orange);margin-bottom:4px">⚠️ ${op.chal}</div>`:''}
-      <button class="btn btn-primary btn-sm" onclick="openOpUpd(${p.id},${op.id})">✏️ تحديث</button>`;
+  myOps.forEach(({p,op,isCycle,cycleId,cycleLabel,noCycle})=>{
+    const div=document.createElement('div');
+    if(isCycle&&noCycle){
+      // رسالة انتظار الدورة
+      div.className='my-op-card';
+      div.innerHTML=`
+        <div style="font-size:11px;color:var(--mgray);margin-bottom:4px">📋 ${p.name} — ${p.dept}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px">${p.schedule==='monthly'?'🔁 متكرر شهري':'📆 متكرر سنوي'} ${p.recurLabel||''}</div>
+        <div style="background:#FFF8E1;border-radius:8px;padding:10px;text-align:center;color:#7A5800;font-size:13px">
+          ⏳ انتظري المدير لبدء الدورة الجديدة
+        </div>`;
+    } else if(isCycle){
+      // بطاقة عملية دورة
+      div.className='my-op-card';
+      div.innerHTML=`
+        <div style="font-size:11px;color:var(--mgray);margin-bottom:4px">📋 ${p.name} — دورة: ${cycleLabel}</div>
+        <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:8px">⚙️ ${op.opName}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${sb(op.status)}</div>
+        ${op.doneDate?`<div style="font-size:11px;color:#27AE60;margin-bottom:8px">✓ أُنجز في ${op.doneDate} بواسطة ${op.doneBy}</div>`:''}
+        ${op.status!=='مكتمل'?`<button onclick="updateCycleOp(${p.id},${cycleId},${op.opId},'مكتمل')" class="btn btn-primary btn-sm">✅ تم الإنجاز</button>`:''}
+        ${op.status==='مكتمل'?`<button onclick="updateCycleOp(${p.id},${cycleId},${op.opId},'قيد التشغيل')" class="btn btn-sm" style="background:#E67E22;color:#fff">↩️ تراجع</button>`:''}`;
+    } else {
+      // بطاقة عملية عادية
+      const d=dstat(op.status,op.end,p);const cls=d.k==='late'?'late':d.k==='soon'?'soon':'';
+      div.className=`my-op-card ${cls}`;
+      div.innerHTML=`
+        <div style="font-size:11px;color:var(--mgray);margin-bottom:4px">📋 ${p.name} — ${p.dept}</div>
+        <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">⚙️ ${op.name}</div>
+        <div style="font-size:12px;color:var(--mgray);margin-bottom:8px">${op.start?`البداية: ${op.start} | `:''}${op.end?`النهاية: ${op.end}`:''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">${sb(op.status)}<span class="badge ${d.c}">${d.l}</span></div>
+        ${op.ach?`<div style="font-size:12px;color:var(--green);margin-bottom:4px">✅ ${op.ach}</div>`:''}
+        ${op.chal?`<div style="font-size:12px;color:var(--orange);margin-bottom:4px">⚠️ ${op.chal}</div>`:''}
+        <button class="btn btn-primary btn-sm" onclick="openOpUpd(${p.id},${op.id})">✏️ تحديث</button>`;
+    }
     c.appendChild(div);
   });
 }
@@ -2061,8 +2414,190 @@ function saveOpUpd(){
   save();cm('upd-modal');renderMyOps();renderDash();toast('✅ تم التحديث');
 }
 
+
+// ═══════════════ NOTIFICATIONS SYSTEM ═══════════════
+
+function initNotifSelect(){
+  const sel=document.getElementById('notif-to');
+  if(!sel)return;
+  sel.innerHTML='<option value="all">📢 الكل</option>';
+  USERS.filter(u=>u.id!==CU.id).forEach(u=>{
+    sel.innerHTML+=`<option value="${u.id}">${u.name} (${RL[u.role]||u.role})</option>`;
+  });
+}
+
+function sendNotif(){
+  const msg=document.getElementById('notif-msg')?.value.trim();
+  if(!msg){toast('⚠️ يرجى كتابة نص الإشعار',true);return;}
+  const toId=document.getElementById('notif-to')?.value||'all';
+  const type=document.getElementById('notif-type')?.value||'info';
+  const notif={
+    id:Date.now(),
+    fromId:CU.id,
+    fromName:'إدارة النظام',
+    toId,
+    type,
+    msg,
+    date:td(),
+    time:new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}),
+    readBy:[]
+  };
+  NOTIFICATIONS.unshift(notif);
+  save();
+  document.getElementById('notif-msg').value='';
+  renderAlerts();
+  toast('✅ تم إرسال الإشعار');
+}
+
+function sendAutoLateNotifs(){
+  const procs=getVis();
+  const lateProcs=procs.filter(p=>dstat(p.status,p.end,p).k==='late');
+  if(!lateProcs.length){toast('✅ لا توجد إجراءات متأخرة حالياً');return;}
+
+  let count=0;
+  lateProcs.forEach(p=>{
+    // جمع الموظفين المسؤولين عن عمليات غير مكتملة
+    const ops=(p.operations||[]).filter(o=>o.status!=='مكتمل');
+    const assignedIds=new Set();
+    ops.forEach(op=>(op.assignedIds||[]).forEach(id=>assignedIds.add(id)));
+
+    assignedIds.forEach(uid=>{
+      const days=Math.abs(dl(p.end)||0);
+      const notif={
+        id:Date.now()+count,
+        fromId:CU.id,
+        fromName:'إدارة النظام',
+        toId:uid,
+        type:'reminder',
+        msg:`تذكير بأن الإجراء "${p.name}" قد تجاوز موعده المحدد بـ ${days} يوم. نأمل منكم متابعة العمليات المسندة إليكم والإفادة بآخر مستجداتها، وشكراً لتعاونكم.`,
+        date:td(),
+        time:new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}),
+        readBy:[],
+        autoGenerated:true,
+        procId:p.id
+      };
+      NOTIFICATIONS.unshift(notif);
+      count++;
+    });
+
+    // إشعار للمدراء أيضاً
+    const mgrs=USERS.filter(u=>['Manager','Section Head'].includes(u.role)&&u.dept===p.dept&&u.id!==CU.id);
+    mgrs.forEach(mgr=>{
+      const days=Math.abs(dl(p.end)||0);
+      const notif={
+        id:Date.now()+count+1000,
+        fromId:CU.id,
+        fromName:'إدارة النظام',
+        toId:mgr.id,
+        type:'reminder',
+        msg:`تنويه: الإجراء "${p.name}" في دائرتكم قد تجاوز موعده بـ ${days} يوم. يُرجى التكرم بالاطلاع والمتابعة مع الفريق المختص. شكراً لاهتمامكم.`,
+        date:td(),
+        time:new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}),
+        readBy:[],
+        autoGenerated:true,
+        procId:p.id
+      };
+      NOTIFICATIONS.unshift(notif);
+      count++;
+    });
+  });
+
+  if(count>0){
+    save();
+    renderAlerts();
+    toast(`✅ تم إرسال ${count} إشعار للمتأخرين`);
+  } else {
+    toast('ℹ️ لا يوجد موظفون مسؤولون عن الإجراءات المتأخرة');
+  }
+}
+
+function getMyNotifs(){
+  return NOTIFICATIONS.filter(n=>n.toId==='all'||n.toId===CU.id);
+}
+
+function getUnreadCount(){
+  return getMyNotifs().filter(n=>!(n.readBy||[]).includes(CU.id)).length;
+}
+
+function markRead(nid){
+  const n=NOTIFICATIONS.find(x=>x.id===nid);
+  if(!n)return;
+  if(!(n.readBy||[]).includes(CU.id)){
+    if(!n.readBy)n.readBy=[];
+    n.readBy.push(CU.id);
+    save();
+    renderMyNotifsList();
+  }
+}
+
+function markAllRead(){
+  let changed=false;
+  getMyNotifs().forEach(n=>{
+    if(!(n.readBy||[]).includes(CU.id)){
+      if(!n.readBy)n.readBy=[];
+      n.readBy.push(CU.id);
+      changed=true;
+    }
+  });
+  if(changed){save();renderAlerts();toast('✅ تم تحديد الكل كمقروء');}
+}
+
+function clearMyNotifs(){
+  if(!confirm('هل تريد مسح جميع إشعاراتك؟'))return;
+  // نحذف فقط الإشعارات التي للمستخدم الحالي وليست للكل
+  // للإشعارات العامة نكتفي بوضع علامة مقروء
+  NOTIFICATIONS=NOTIFICATIONS.filter(n=>{
+    if(n.toId===CU.id)return false; // احذف إشعاراتي الشخصية
+    if(n.toId==='all'){
+      // اعتبرها مقروءة
+      if(!n.readBy)n.readBy=[];
+      if(!n.readBy.includes(CU.id))n.readBy.push(CU.id);
+    }
+    return true;
+  });
+  save();renderAlerts();toast('🗑️ تم مسح إشعاراتك');
+}
+
+function renderMyNotifsList(){
+  const el=document.getElementById('my-notifs-list');if(!el)return;
+  const myNotifs=getMyNotifs();
+  const badge=document.getElementById('unread-count-badge');
+  const unread=getUnreadCount();
+  if(badge){
+    badge.innerHTML=unread>0?`<span class="notif-counter">${unread}</span>`:'';
+  }
+  if(!myNotifs.length){
+    el.innerHTML='<div class="inbox-empty"><div class="icon">📭</div><p>لا توجد إشعارات</p></div>';
+    return;
+  }
+  el.innerHTML=myNotifs.slice(0,50).map(n=>{
+    const isRead=(n.readBy||[]).includes(CU.id);
+    const typeIcon=n.type==='urgent'?'🚨':n.type==='reminder'?'🔔':'ℹ️';
+    const cls=isRead?'read':(n.type==='urgent'?'urgent':'unread');
+    return`<div class="notif-item ${cls}" onclick="markRead(${n.id})">
+      <div class="notif-av ${n.type}">${typeIcon}</div>
+      <div class="notif-body">
+        <div class="notif-from">من: ${n.fromName} ${n.autoGenerated?'<span style="background:#fef3c7;color:#92400e;border-radius:99px;padding:1px 6px;font-size:10px">تلقائي</span>':''}</div>
+        <div class="notif-msg">${n.msg}</div>
+        <div class="notif-meta">
+          <span>📅 ${n.date}</span>
+          <span>🕐 ${n.time||''}</span>
+          ${!isRead?`<span class="notif-badge-unread">جديد</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ═══════════════ ALERTS ═══════════════
 function renderAlerts(){
+  // render notifications section — Admin only
+  const isAdmin=CU.role==='Admin';
+  const mgrSec=document.getElementById('notif-mgr-section');
+  if(mgrSec)mgrSec.style.display=isAdmin?'block':'none';
+  if(isAdmin)initNotifSelect();
+  renderMyNotifsList();
+
   const procs=getVis();
   const late=procs.filter(p=>dstat(p.status,p.end,p).k==='late');
   const soon=procs.filter(p=>dstat(p.status,p.end,p).k==='soon');
