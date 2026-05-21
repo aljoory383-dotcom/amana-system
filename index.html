@@ -1142,27 +1142,20 @@ function updateOngoingOp(pid,opId,newStatus){
 
 
 function save(){
+  // حفظ فوري في localStorage قبل الإرسال لـ JSONBin
+  try{
+    localStorage.setItem('procs_v4',JSON.stringify(PROCS));
+    localStorage.setItem('users_v4',JSON.stringify(USERS));
+    localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
+    localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
+  }catch(e){}
+  // ثم إرسال لـ JSONBin بشكل غير متزامن
   const payload={procs:PROCS,users:USERS,teams:TEAMS_DB,notifications:NOTIFICATIONS};
   fetch('https://api.jsonbin.io/v3/b/6a05689ac0954111d81f6fe3',{
     method:'PUT',
     headers:{'Content-Type':'application/json','X-Master-Key':'$2a$10$BudsP8SrM9iNKAbl9ZhZKuzGUGVTXBGnSK8Lckh/V3k8rzQk/TUem'},
     body:JSON.stringify(payload)
-  }).then(()=>{
-    try{
-      localStorage.setItem('procs_v4',JSON.stringify(PROCS));
-      localStorage.setItem('users_v4',JSON.stringify(USERS));
-      localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
-      localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
-    }catch(e){}
-  }).catch(e=>{
-    console.warn('JSONBin save failed:',e);
-    try{
-      localStorage.setItem('procs_v4',JSON.stringify(PROCS));
-      localStorage.setItem('users_v4',JSON.stringify(USERS));
-      localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
-      localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
-    }catch(e2){}
-  });
+  }).catch(e=>console.warn('JSONBin save failed:',e));
 }
 async function load(){
   try{
@@ -2526,7 +2519,10 @@ function sendAutoLateNotifs(){
 }
 
 function getMyNotifs(){
-  return NOTIFICATIONS.filter(n=>n.toId==='all'||n.toId===CU.id);
+  return NOTIFICATIONS.filter(n=>{
+    if((n.deletedBy||[]).includes(CU.id))return false; // محذوف عندي
+    return n.toId==='all'||n.toId===CU.id;
+  });
 }
 
 function getUnreadCount(){
@@ -2541,6 +2537,7 @@ function markRead(nid){
     n.readBy.push(CU.id);
     save();
     renderMyNotifsList();
+    updateAlertTabBadge();
   }
 }
 
@@ -2553,23 +2550,33 @@ function markAllRead(){
       changed=true;
     }
   });
-  if(changed){save();renderAlerts();toast('✅ تم تحديد الكل كمقروء');}
+  if(changed){save();renderAlerts();updateAlertTabBadge();toast('✅ تم تحديد الكل كمقروء');}
 }
 
 function clearMyNotifs(){
   if(!confirm('هل تريد مسح جميع إشعاراتك؟'))return;
-  // نحذف فقط الإشعارات التي للمستخدم الحالي وليست للكل
-  // للإشعارات العامة نكتفي بوضع علامة مقروء
+  // حذف كل الإشعارات الموجهة لي (شخصية أو عامة)
+  // للعامة: نضيف المستخدم لقائمة "محذوف عندي" بدل حذف الإشعار للكل
   NOTIFICATIONS=NOTIFICATIONS.filter(n=>{
-    if(n.toId===CU.id)return false; // احذف إشعاراتي الشخصية
+    if(n.toId===CU.id)return false; // إشعار شخصي — احذفه
     if(n.toId==='all'){
-      // اعتبرها مقروءة
-      if(!n.readBy)n.readBy=[];
-      if(!n.readBy.includes(CU.id))n.readBy.push(CU.id);
+      // إشعار عام — أضف لقائمة المحذوف عندي
+      if(!n.deletedBy)n.deletedBy=[];
+      if(!n.deletedBy.includes(CU.id))n.deletedBy.push(CU.id);
     }
     return true;
   });
-  save();renderAlerts();toast('🗑️ تم مسح إشعاراتك');
+  // حفظ فوري
+  try{
+    localStorage.setItem('notifs_v4',JSON.stringify(NOTIFICATIONS));
+    localStorage.setItem('procs_v4',JSON.stringify(PROCS));
+    localStorage.setItem('users_v4',JSON.stringify(USERS));
+    localStorage.setItem('teams_v4',JSON.stringify(TEAMS_DB));
+  }catch(e){}
+  save();
+  renderAlerts();
+  updateAlertTabBadge();
+  toast('🗑️ تم مسح إشعاراتك');
 }
 
 function renderMyNotifsList(){
